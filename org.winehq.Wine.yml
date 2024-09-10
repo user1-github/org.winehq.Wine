@@ -1,11 +1,11 @@
 id: org.winehq.Wine
-default-branch: &app-version stable-23.08
-x-extension-versions: &extension-versions stable;stable-23.08
+default-branch: &app-version stable-24.08
+x-extension-versions: &extension-versions stable;stable-24.08
 sdk: org.freedesktop.Sdk
 runtime: org.freedesktop.Platform
-runtime-version: &runtime-version '23.08'
+runtime-version: &runtime-version '24.08'
 x-gl-version: &gl-version '1.4'
-x-gl-versions: &gl-versions 23.08;1.4
+x-gl-versions: &gl-versions 24.08;1.4
 x-gl-merge-dirs: &gl-merge-dirs vulkan/icd.d;glvnd/egl_vendor.d;egl/egl_external_platform.d;OpenCL/vendors;lib/dri;lib/d3d;lib/gbm;vulkan/explicit_layer.d;vulkan/implicit_layer.d
 finish-args:
   - --share=ipc
@@ -265,8 +265,8 @@ modules:
       - /bin
     sources: &openldap-sources
       - type: archive
-        url: https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.1.tgz
-        sha256: 9d576ea6962d7db8a2e2808574e8c257c15aef55f403a1fb5a0faf35de70e6f3
+        url: https://www.openldap.org/software/download/OpenLDAP/openldap-release/openldap-2.6.8.tgz
+        sha256: 48969323e94e3be3b03c6a132942dcba7ef8d545f2ad35401709019f696c3c4e
 
   - name: openldap-32bit
     build-options:
@@ -501,11 +501,6 @@ modules:
         install -Dm644
         -t ${FLATPAK_DEST}/share/wine/gecko/share/metainfo/
         ${FLATPAK_ID}.gecko.metainfo.xml
-      - >-
-        appstream-compose
-        --basename=${FLATPAK_ID}.gecko
-        --prefix=${FLATPAK_DEST}/share/wine/gecko
-        --origin=flatpak ${FLATPAK_ID}.gecko
     sources:
       - type: file
         only-arches:
@@ -542,11 +537,6 @@ modules:
         install -Dm644
         -t ${FLATPAK_DEST}/share/wine/mono/share/metainfo/
         ${FLATPAK_ID}.mono.metainfo.xml
-      - >-
-        appstream-compose
-        --basename=${FLATPAK_ID}.mono
-        --prefix=${FLATPAK_DEST}/share/wine/mono
-        --origin=flatpak ${FLATPAK_ID}.mono
     sources:
       - type: archive
         url: https://dl.winehq.org/wine/wine-mono/8.1.0/wine-mono-8.1.0-x86.tar.xz
