@@ -24,7 +24,6 @@ finish-args:
   - --filesystem=xdg-music
   - --filesystem=xdg-videos
   - --filesystem=xdg-download
-  - --env=WINEDLLPATH=/app/dlls/lib32:/app/dlls/lib
   - --env=WINEPREFIX=/var/data/wine
   - --env=GST_PLUGIN_SYSTEM_PATH=/app/lib32/gstreamer-1.0:/app/lib/gstreamer-1.0:/usr/lib/i386-linux-gnu/gstreamer-1.0:/usr/lib/x86_64-linux-gnu/gstreamer-1.0
 command: wine
@@ -93,14 +92,6 @@ add-extensions:
   org.winehq.Wine.mono:
     directory: share/wine/mono
     bundle: true
-
-  org.winehq.Wine.DLLs:
-    directory: dlls
-    subdirectories: true
-    no-autodownload: true
-    merge-dirs: lib;lib32;
-    version: *app-version
-    versions: *extension-versions
 
 sdk-extensions:
   - org.freedesktop.Sdk.Compat.i386
@@ -206,13 +197,18 @@ modules:
       - install -Dm 644 krb5.conf -t /app/etc
     sources:
       - type: file
-        path: files/krb5.conf
+        path: krb5.conf
 
   - name: unixodbc
     sources: &unixodbc-sources
       - type: archive
-        url: http://www.unixodbc.org/unixODBC-2.3.12.tar.gz
+        url: https://github.com/lurcher/unixODBC/releases/download/2.3.12/unixODBC-2.3.12.tar.gz
         sha256: f210501445ce21bf607ba51ef8c125e10e22dffdffec377646462df5f01915ec
+        x-checker-data:
+          type: anitya
+          project-id: 7344
+          stable-only: true
+          url-template: https://github.com/lurcher/unixODBC/releases/download/$version/unixODBC-$version.tar.gz
     cleanup: &unixodbc-cleanup
       - /bin
 
@@ -259,9 +255,6 @@ modules:
           version-pattern: Wine version (\d[\d\w\.-]+\d)
           url-template: https://dl.winehq.org/wine/source/$major.$minor/wine-$version.tar.xz
           is-main-source: true
-      - type: patch
-        paths:
-          - patches/wine/loader-prefer-winedllpath.patch
 
   # 32-bit compatibility build
 
@@ -306,7 +299,6 @@ modules:
         no-autogen: true
         make-args:
           - all2
-          - OPTFLAGS=-O2 -g
           - DEST_HOME=/app
           - DEST_BIN=/app/bin
           - DEST_SHARE=/app/lib/p7zip
@@ -318,38 +310,24 @@ modules:
           - DEST_MAN=/app/share/man
         sources:
           - type: archive
-            url: https://downloads.sourceforge.net/p7zip/p7zip_16.02_src_all.tar.bz2
-            sha256: 5eb20ac0e2944f6cb9c2d51dd6c4518941c185347d4089ea89087ffdd6e2341f
-          - type: patch
-            paths:
-              - patches/p7zip/gcc10-conversion.patch
-              - patches/p7zip/14-Fix-g++-warning.patch
-          - type: shell
-            only-arches:
-              - x86_64
-            commands:
-              - ln -sf makefile.linux_amd64_asm makefile.machine
-          - type: shell
-            only-arches:
-              - i386
-            commands:
-              - ln -sf makefile.linux_x86_asm_gcc_4.X makefile.machine
-        modules:
-
-          - name: yasm
-            buildsystem: cmake-ninja
-            sources:
-              - type: archive
-                url: https://github.com/yasm/yasm/archive/v1.3.0.tar.gz
-                sha256: f708be0b7b8c59bc1dbe7134153cd2f31faeebaa8eec48676c10f972a1f13df3
-            cleanup:
-              - '*'
+            url: https://github.com/p7zip-project/p7zip/archive/v17.06/p7zip-v17.06.tar.gz
+            sha256: c35640020e8f044b425d9c18e1808ff9206dc7caf77c9720f57eb0849d714cd1
+            x-checker-data:
+              type: anitya
+              project-id: 2583
+              stable-only: true
+              url-template: https://github.com/p7zip-project/p7zip/archive/v$version/p7zip-v$version.tar.gz
 
       - name: cabextract
         sources:
           - type: archive
             url: https://www.cabextract.org.uk/cabextract-1.11.tar.gz
             sha256: b5546db1155e4c718ff3d4b278573604f30dd64c3c5bfd4657cd089b823a3ac6
+            x-checker-data:
+              type: anitya
+              project-id: 245
+              stable-only: true
+              url-template: https://www.cabextract.org.uk/cabextract-$version.tar.gz
 
   # Bundled extensions
 
@@ -421,7 +399,6 @@ modules:
     build-commands:
       - install -Dm644 -t ${FLATPAK_DEST}/etc ld.so.conf
       - mkdir -p ${FLATPAK_DEST}/{,lib/debug/}lib/i386-linux-gnu/GL
-      - mkdir -p ${FLATPAK_DEST}/dlls
       - install -Dm644 ${FLATPAK_ID}.appdata.xml -t ${FLATPAK_DEST}/share/appdata
       - |
         icondir=${FLATPAK_DEST}/share/icons/hicolor
