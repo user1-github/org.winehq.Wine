@@ -173,8 +173,6 @@ modules:
 
   - name: winetricks
     no-autogen: true
-    make-args:
-      - PREFIX=/app
     make-install-args:
       - PREFIX=/app
     sources:
