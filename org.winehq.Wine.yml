@@ -164,10 +164,7 @@ modules:
     subdir: src
     config-opts: &krb5-config-opts
       - --localstatedir=/var/lib
-      - --sbindir=${FLATPAK_DEST}/bin
       - --disable-rpath
-    cleanup: &krb5-cleanup
-      - /bin
     sources: &krb5-sources
       - type: archive
         url: https://github.com/krb5/krb5/archive/refs/tags/krb5-1.21.3-final.tar.gz
@@ -187,9 +184,11 @@ modules:
     build-options:
       arch:
         x86_64: *compat_i386_opts
+      config-opts:
+        - --bindir=${FLATPAK_DEST}/bin32
+        - --sbindir=${FLATPAK_DEST}/sbin32
     config-opts: *krb5-config-opts
     sources: *krb5-sources
-    cleanup: *krb5-cleanup
 
   - name: krb5-config
     buildsystem: simple
@@ -200,8 +199,6 @@ modules:
         path: krb5.conf
 
   - name: unixodbc
-    cleanup: &unixodbc-cleanup
-      - /bin
     sources: &unixodbc-sources
       - type: archive
         url: https://github.com/lurcher/unixODBC/releases/download/2.3.12/unixODBC-2.3.12.tar.gz
@@ -216,8 +213,10 @@ modules:
     build-options:
       arch:
         x86_64: *compat_i386_opts
+      config-opts:
+        - --bindir=${FLATPAK_DEST}/bin32
+        - --sbindir=${FLATPAK_DEST}/sbin32
     sources: *unixodbc-sources
-    cleanup: *unixodbc-cleanup
 
   - name: opencl-headers
     buildsystem: simple
@@ -272,8 +271,8 @@ modules:
     config-opts: &samba-config-opts
       - --localstatedir=/var
       - --sharedstatedir=/var/lib
-      - --sbindir=/app/bin
       - --enable-fhs
+      - --disable-rpath
       - --disable-python
       - --without-json
       - --without-ad-dc
@@ -283,8 +282,6 @@ modules:
       - --without-acl-support
       - --without-systemd
       - --without-ldb-lmdb
-    cleanup:
-      - /bin
     sources: &samba-sources
       - type: archive
         url: https://samba.org/samba/ftp/stable/samba-4.22.3.tar.gz
@@ -300,11 +297,10 @@ modules:
       arch:
         x86_64: *compat_i386_opts
       config-opts:
-        - --sbindir=bin32
+        - --bindir=bin32
+        - --sbindir=sbin32
         - --libexecdir=lib32/libexec
     config-opts: *samba-config-opts
-    cleanup:
-      - /bin32
     sources: *samba-sources
 
   # Native arch build
@@ -315,7 +311,7 @@ modules:
         x86_64:
           config-opts:
             - --enable-win64
-            - --with-mingw=ccache x86_64-w64-mingw32-gcc
+            - --with-mingw="ccache x86_64-w64-mingw32-gcc"
           libdir: /app/lib
       env:
         LIBDIR: lib
@@ -353,7 +349,7 @@ modules:
         x86_64: *compat_i386_opts
       config-opts:
         - --bindir=${FLATPAK_DEST}/bin32
-        - --with-mingw=ccache i686-w64-mingw32-gcc
+        - --with-mingw="ccache i686-w64-mingw32-gcc"
       env:
         LIBDIR: lib32
     config-opts: *wine-config-opts
@@ -471,7 +467,11 @@ modules:
     buildsystem: simple
     build-commands:
       - install -Dm644 -t ${FLATPAK_DEST}/etc ld.so.conf
-      - mkdir -p ${FLATPAK_DEST}/{,lib/debug/}lib/i386-linux-gnu/GL
+      - mkdir -p ${FLATPAK_DEST}/lib/i386-linux-gnu
+      - mkdir -p ${FLATPAK_DEST}/lib/debug/lib/i386-linux-gnu
+      - mkdir -p ${FLATPAK_DEST}/lib/i386-linux-gnu/GL
+      - mkdir -p ${FLATPAK_DEST}/lib/debug/lib/i386-linux-gnu/GL
+      - mkdir -p ${FLATPAK_DEST}/lib/i386-linux-gnu/dri/intel-vaapi-driver
       - install -Dm644 ${FLATPAK_ID}.appdata.xml -t ${FLATPAK_DEST}/share/appdata
       - |
         icondir=${FLATPAK_DEST}/share/icons/hicolor
