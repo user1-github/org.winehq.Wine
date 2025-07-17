@@ -132,6 +132,7 @@ cleanup:
   - /bin/winemaker
   - /bin/wmc
   - /bin/wrc
+  - /bin32
   - /include
   - /lib/pkgconfig
   - /lib32/pkgconfig
@@ -162,6 +163,9 @@ modules:
 
   - name: krb5
     subdir: src
+    build-options:
+      config-opts:
+        - --sbindir=${FLATPAK_DEST}/bin
     config-opts: &krb5-config-opts
       - --localstatedir=/var/lib
       - --disable-rpath
@@ -186,7 +190,7 @@ modules:
         x86_64: *compat_i386_opts
       config-opts:
         - --bindir=${FLATPAK_DEST}/bin32
-        - --sbindir=${FLATPAK_DEST}/sbin32
+        - --sbindir=${FLATPAK_DEST}/bin32
     config-opts: *krb5-config-opts
     sources: *krb5-sources
 
@@ -215,7 +219,6 @@ modules:
         x86_64: *compat_i386_opts
       config-opts:
         - --bindir=${FLATPAK_DEST}/bin32
-        - --sbindir=${FLATPAK_DEST}/sbin32
     sources: *unixodbc-sources
 
   - name: opencl-headers
@@ -267,12 +270,14 @@ modules:
   - name: samba
     build-options:
       config-opts:
+        - --sbindir=bin
         - --libexecdir=lib/libexec
     config-opts: &samba-config-opts
       - --localstatedir=/var
       - --sharedstatedir=/var/lib
       - --enable-fhs
       - --disable-rpath
+      - --disable-rpath-install
       - --disable-python
       - --without-json
       - --without-ad-dc
@@ -298,7 +303,7 @@ modules:
         x86_64: *compat_i386_opts
       config-opts:
         - --bindir=bin32
-        - --sbindir=sbin32
+        - --sbindir=bin32
         - --libexecdir=lib32/libexec
     config-opts: *samba-config-opts
     sources: *samba-sources
@@ -357,8 +362,6 @@ modules:
     post-install:
       - mv ${FLATPAK_DEST}/bin32/wine{,-preloader} ${FLATPAK_DEST}/bin/
     sources: *wine-sources
-    cleanup:
-      - /bin32
 
   # Tools
 
