@@ -190,8 +190,8 @@ modules:
   - name: unixodbc
     sources: &unixodbc-sources
       - type: archive
-        url: https://www.unixodbc.org/unixODBC-2.3.13.tar.gz
-        sha256: 119afef5f4cb04e780ca6cf763265b9fb2b99c4c11349a3f9cab14069d2c7c2b
+        url: https://www.unixodbc.org/unixODBC-2.3.14.tar.gz
+        sha256: 4e2814de3e01fc30b0b9f75e83bb5aba91ab0384ee951286504bb70205524771
         x-checker-data:
           type: anitya
           project-id: 7344
@@ -462,7 +462,7 @@ modules:
       - mkdir -p ${FLATPAK_DEST}/lib/i386-linux-gnu/GL
       - mkdir -p ${FLATPAK_DEST}/lib/debug/lib/i386-linux-gnu/GL
       - mkdir -p ${FLATPAK_DEST}/lib/i386-linux-gnu/dri/intel-vaapi-driver
-      - install -Dm644 ${FLATPAK_ID}.appdata.xml -t ${FLATPAK_DEST}/share/appdata
+      - install -Dm644 ${FLATPAK_ID}.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo
       - |
         icondir=${FLATPAK_DEST}/share/icons/hicolor
         install -Dm644 wine-logo.svg ${icondir}/scalable/apps/wine.svg
@@ -476,4 +476,4 @@ modules:
       - type: file
         path: wine-logo.svg
       - type: file
-        path: org.winehq.Wine.appdata.xml
+        path: org.winehq.Wine.metainfo.xml
